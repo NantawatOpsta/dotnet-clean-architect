@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+    volumes:
+      - ./source:/app
+    command: sleep infinity
