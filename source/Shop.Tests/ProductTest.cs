@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shop.Entity;
+using Shop.Usecase;
 
 namespace Shop.Product.Tests;
 
@@ -21,7 +22,8 @@ public class ProductTest
             context.SaveChanges();
 
             // Act
-            var availableProducts = context.GetAvailableProducts();
+            var productUsecase = new Usecase.ProductUsecase(context);
+            var availableProducts = productUsecase.GetAvailableProducts();
 
             // Assert
             Assert.Equal(2, availableProducts.Count());

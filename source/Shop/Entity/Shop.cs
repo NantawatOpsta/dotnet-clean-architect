@@ -14,11 +14,6 @@ public class ShopContext : DbContext
     {
     }
 
-    // get available products
-    public List<Product> GetAvailableProducts()
-    {
-        return Products.Where(p => p.IsAvailable).ToList();
-    }
 }
 
 public class Product
