@@ -1,3 +1,7 @@
+using Shop.Usecase;
+using Microsoft.EntityFrameworkCore;
+using Shop.Entity;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,28 +18,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// health check
+app.MapGet("/", () => Results.Ok("Healthy"));
 
-app.MapGet("/weatherforecast", () =>
+// post /products
+app.MapPost("/product", async (ShopContext context, Product product) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    context.Products.Add(product);
+    await context.SaveChangesAsync();
+
+    // return created product in json format
+    return Results.Created($"/product/{product.Id}", product);
+});
+
+// get /product
+app.MapGet("/product", async (ShopContext context) =>
+{
+    var products = await context.Products.ToListAsync();
+    return Results.Ok(products);
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
