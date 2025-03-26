@@ -25,10 +25,19 @@ app.UseHttpsRedirection();
 // health check
 app.MapGet("/", () => Results.Ok("Healthy"));
 
+// list products
 app.MapGet("/api/product", async (ShopContext db) =>
 {
     var products = await db.Products.ToListAsync();
     return Results.Ok(products);
+});
+
+// create product
+app.MapPost("/api/product", async (ShopContext db, Product product) =>
+{
+    db.Products.Add(product);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/product/{product.Id}", product);
 });
 
 app.Run();
