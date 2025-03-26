@@ -7,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddDbContext<ShopContext>(options =>
+{
+    options.UseNpgsql("Host=db;Database=postgres;Username=postgres;Password=password");
+});
 
 var app = builder.Build();
 
@@ -21,20 +25,9 @@ app.UseHttpsRedirection();
 // health check
 app.MapGet("/", () => Results.Ok("Healthy"));
 
-// post /products
-app.MapPost("/product", async (ShopContext context, Product product) =>
+app.MapGet("/api/product", async (ShopContext db) =>
 {
-    context.Products.Add(product);
-    await context.SaveChangesAsync();
-
-    // return created product in json format
-    return Results.Created($"/product/{product.Id}", product);
-});
-
-// get /product
-app.MapGet("/product", async (ShopContext context) =>
-{
-    var products = await context.Products.ToListAsync();
+    var products = await db.Products.ToListAsync();
     return Results.Ok(products);
 });
 

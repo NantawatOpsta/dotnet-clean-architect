@@ -1,5 +1,10 @@
 services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
   app:
+    container_name: app
     build: .
     volumes:
       - ./source:/app
