@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ShopContext>(options =>
 {
-    options.UseNpgsql("Host=db;Database=postgres;Username=postgres;Password=password");
+    options.UseNpgsql(builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
 
 var app = builder.Build();
