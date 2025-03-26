@@ -40,4 +40,17 @@ app.MapPost("/api/product", async (ShopContext db, Product product) =>
     return Results.Created($"/api/product/{product.Id}", product);
 });
 
+// delete product
+app.MapDelete("/api/product/{id}", async (ShopContext db, int id) =>
+{
+    var product = await db.Products.FindAsync(id);
+    if (product == null)
+    {
+        return Results.NotFound();
+    }
+    db.Products.Remove(product);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 app.Run();
