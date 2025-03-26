@@ -1,6 +1,12 @@
 using Shop.Usecase;
 using Microsoft.EntityFrameworkCore;
 using Shop.Entity;
+using Microsoft.Extensions.Logging;
+
+using ILoggerFactory factory = LoggerFactory.Create(builder => builder
+    .AddConsole()
+    .SetMinimumLevel(LogLevel.Debug));
+ILogger logger = factory.CreateLogger("Shop");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +34,7 @@ app.MapGet("/", () => Results.Ok("Healthy"));
 // list products
 app.MapGet("/api/product", async (ShopContext db) =>
 {
+    logger.LogInformation("list products");
     var products = await db.Products.ToListAsync();
     return Results.Ok(products);
 });
@@ -35,6 +42,12 @@ app.MapGet("/api/product", async (ShopContext db) =>
 // create product
 app.MapPost("/api/product", async (ShopContext db, Product product) =>
 {
+    logger.LogInformation("create product");
+    logger.LogDebug("Product Details - Id: {Id}, Name: {Name}, Price: {Price}", 
+        product.Id, 
+        product.Name, 
+        product.Price);
+    db.Products.Add(product);
     db.Products.Add(product);
     await db.SaveChangesAsync();
     return Results.Created($"/api/product/{product.Id}", product);
