@@ -48,7 +48,6 @@ app.MapPost("/api/product", async (ShopContext db, Product product) =>
         product.Name, 
         product.Price);
     db.Products.Add(product);
-    db.Products.Add(product);
     await db.SaveChangesAsync();
     return Results.Created($"/api/product/{product.Id}", product);
 });
