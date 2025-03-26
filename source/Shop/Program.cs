@@ -1,7 +1,6 @@
 using Shop.Usecase;
 using Microsoft.EntityFrameworkCore;
 using Shop.Entity;
-using Microsoft.Extensions.Logging;
 
 using ILoggerFactory factory = LoggerFactory.Create(builder => builder
     .AddConsole()
@@ -32,10 +31,12 @@ app.UseHttpsRedirection();
 app.MapGet("/", () => Results.Ok("Healthy"));
 
 // list products
-app.MapGet("/api/product", async (ShopContext db) =>
+app.MapGet("/api/product", (ShopContext db) =>
 {
     logger.LogInformation("list products");
-    var products = await db.Products.ToListAsync();
+    var useCase = new ProductUsecase(db);
+    var products = useCase.GetAvailableProducts();
+
     return Results.Ok(products);
 });
 
