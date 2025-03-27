@@ -5,7 +5,9 @@ services:
       POSTGRES_PASSWORD: password
   app:
     container_name: app
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
       - ./source:/app
     command: sleep infinity
