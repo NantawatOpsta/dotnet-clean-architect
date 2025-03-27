@@ -14,11 +14,32 @@ public class ShopContext : DbContext
     {
     }
 
+    public decimal GetProductDiscountPrice(int productId)
+    {
+        var product = Products.Find(productId);
+        if (product == null)
+        {
+            throw new ArgumentException("Product not found");
+        }
+
+        var promotion = Promotions
+            .Where(p => p.Categories.Any(c => c.Products.Any(p => p.Id == productId)))
+            .FirstOrDefault();
+
+        if (promotion == null)
+        {
+            return product.Price;
+        }
+
+        return product.Price - (product.Price * promotion.Discount);
+    }
+
 }
 
 public class Product
 {
     public int Id { get; set; }
+    public int Sku { get; set; }
     public required string Name { get; set; }
     public decimal Price { get; set; }
     public bool IsAvailable { get; set; }

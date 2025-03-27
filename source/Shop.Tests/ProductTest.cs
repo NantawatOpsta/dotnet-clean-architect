@@ -29,4 +29,39 @@ public class ProductTest
             Assert.Equal(2, availableProducts.Count());
         }
     }
+
+    [Fact]
+    public void TestGetProductDiscountPrice()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ShopContext>()
+            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .Options;
+
+        using (var context = new ShopContext(options))
+        {
+            context.Products.Add(new Entity.Product { Name = "Product 1", Price = 10, IsAvailable = true });
+            context.SaveChanges();  
+
+            var category = new Entity.Category { Name = "Category 1" };
+            var product = context.Products.FirstOrDefault(p => p.Name == "Product 1");
+            if (product != null)
+            {
+                category.Products.Add(product);
+            }
+            context.Categories.Add(category);
+            context.SaveChanges();
+
+            var promotion = new Entity.Promotion { Name = "Promotion 1", Discount = 0.1m };
+            promotion.Categories.Add(category);
+            context.Promotions.Add(promotion);
+            context.SaveChanges();
+
+            // Act
+            var productDiscountPrice = context.GetProductDiscountPrice(product.Id);
+
+            // Assert
+            Assert.Equal(9, productDiscountPrice);
+        }
+    }
 }
